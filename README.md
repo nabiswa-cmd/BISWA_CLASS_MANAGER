@@ -35,13 +35,7 @@ cd IN16_Study_Manager
 ```bash
 python manage.py makemigrations
 python manage.py migrate
-```
-
-### 4. Seed sample data (recommended)
-
-```bash
-python seed_data.py
-```
+````
 
 This creates:
 - 6 units
@@ -105,22 +99,9 @@ IN16_Study_Manager/
             └── reminders.html
 ```
 
----
-
-## Default Student Credentials
-
-| Username | Password | Reg Number |
-|---|---|---|
-| alicewanjiru | pass1234 | SCT211-0001/2023 |
-| brianotieno | pass1234 | SCT211-0002/2023 |
-| carolmuthoni | pass1234 | SCT211-0003/2023 |
-| davidkamau | pass1234 | SCT211-0004/2023 |
-
----
-
 ## Tech Stack
 - **Backend**: Django 4+
 - **Frontend**: Bootstrap 5.3 + Bootstrap Icons
 - **Fonts**: Sora + JetBrains Mono (Google Fonts)
-- **Database**: SQLite (default)
+- **Database**: SQLite (default)/postgresSQL
 - **Auth**: Django built-in authentication
