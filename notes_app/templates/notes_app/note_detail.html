@@ -1,0 +1,54 @@
+{% extends 'notes_app/base.html' %}
+{% block title %}{{ note.topic }} — IN16{% endblock %}
+{% block page_title %}Note Detail{% endblock %}
+
+{% block content %}
+
+<!-- Back button -->
+<div class="mb-3">
+  <a href="{% url 'notes_by_unit' note.unit.id %}"
+     class="btn btn-sm"
+     style="border:1px solid var(--in16-accent); color:var(--in16-accent);">
+    <i class="bi bi-arrow-left me-1"></i>
+    Back to {{ note.unit.name }} Notes
+  </a>
+</div>
+
+<!-- Note Card -->
+<div class="card card-hover">
+
+  <!-- Header -->
+  <div class="card-header">
+    <div class="d-flex align-items-center gap-3 flex-wrap">
+
+      <div>
+        <span class="unit-badge mb-1 d-inline-block">
+          {{ note.unit.name }}
+        </span>
+
+        <h4 class="fw-bold mb-0">
+          {{ note.topic }}
+        </h4>
+      </div>
+
+      <div class="ms-auto text-muted small">
+        <i class="bi bi-clock me-1" style="color:var(--in16-accent);"></i>
+        {{ note.updated_at|date:"M d, Y H:i" }}
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="card-body">
+    <div class="note-full-content"
+         style="line-height:1.8;
+                white-space:pre-wrap;
+                font-size:.95rem;">
+      {{ note.content }}
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}

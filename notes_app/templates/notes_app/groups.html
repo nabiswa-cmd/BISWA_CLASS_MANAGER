@@ -1,0 +1,124 @@
+{% extends 'notes_app/base.html' %}
+{% block title %}Groups — IN16{% endblock %}
+{% block page_title %}Study Groups{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h4 class="fw-bold mb-1">
+    <i class="bi bi-people me-2"></i>Study Groups
+  </h4>
+  <p class="mb-0 opacity-75 small">
+    {% if selected_unit %}Groups for {{ selected_unit.name }}{% else %}All study groups{% endif %}
+  </p>
+</div>
+
+<!-- Unit filter -->
+<div class="d-flex gap-2 flex-wrap mb-4">
+  <a href="{% url 'groups' %}"
+     class="btn btn-sm"
+     style="{% if not selected_unit %}
+            background:var(--in16-accent);color:white;border:none;
+            {% else %}
+            border:1px solid var(--in16-accent);color:var(--in16-accent);
+            {% endif %}">
+    All Units
+  </a>
+
+  {% for unit in units %}
+  <a href="{% url 'groups_by_unit' unit.id %}"
+     class="btn btn-sm"
+     style="{% if selected_unit.id == unit.id %}
+            background:var(--in16-accent);color:white;border:none;
+            {% else %}
+            border:1px solid var(--in16-accent);color:var(--in16-accent);
+            {% endif %}">
+    {{ unit.name }}
+  </a>
+  {% endfor %}
+</div>
+
+{% if groups %}
+<div class="row g-3">
+  {% for group in groups %}
+  <div class="col-12 col-md-6">
+    <div class="card card-hover h-100">
+
+      <!-- Header -->
+      <div class="card-header d-flex align-items-center justify-content-between">
+        <div>
+          <span class="unit-badge d-inline-block mb-1">{{ group.unit.name }}</span>
+          <h6 class="mb-0 fw-bold">{{ group.name }}</h6>
+        </div>
+
+        <span class="badge rounded-pill"
+              style="background:var(--in16-dark);color:white;">
+          {{ group.members.count }} members
+        </span>
+      </div>
+
+      <!-- Members -->
+      <div class="card-body p-0">
+        {% if group.members.all %}
+        <div class="list-group list-group-flush">
+
+          {% for member in group.members.all %}
+          <div class="list-group-item py-2 px-3 d-flex align-items-center gap-3">
+
+            <!-- Avatar -->
+            <div class="rounded-circle d-flex align-items-center justify-content-center text-white flex-shrink-0"
+                 style="width:32px;height:32px;
+                        background:linear-gradient(135deg,var(--in16-accent),var(--in16-success));
+                        font-size:.75rem;font-weight:700;">
+              {{ member.user.first_name|first }}{{ member.user.last_name|first }}
+            </div>
+
+            <!-- Info -->
+            <div>
+              <div class="small fw-500">
+                {{ member.user.get_full_name|default:member.user.username }}
+              </div>
+              <div class="mono text-muted" style="font-size:.72rem;">
+                {{ member.reg_number }}
+              </div>
+            </div>
+
+            <!-- Gender -->
+            <div class="ms-auto">
+              <span class="badge rounded-pill"
+                    style="
+                      {% if member.gender == 'M' %}
+                        background:var(--in16-dark);color:white;
+                      {% elif member.gender == 'F' %}
+                        background:var(--in16-accent);color:white;
+                      {% else %}
+                        background:var(--in16-success);color:white;
+                      {% endif %}
+                      font-size:.65rem;">
+                {{ member.get_gender_display }}
+              </span>
+            </div>
+
+          </div>
+          {% endfor %}
+
+        </div>
+        {% else %}
+        <div class="p-3 text-center text-muted small">
+          No members assigned yet.
+        </div>
+        {% endif %}
+      </div>
+
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="text-center py-5 text-muted">
+  <i class="bi bi-people display-3 opacity-25 d-block mb-3"></i>
+  <p>
+    No groups found{% if selected_unit %} for {{ selected_unit.name }}{% endif %}.
+  </p>
+</div>
+{% endif %}
+{% endblock %}

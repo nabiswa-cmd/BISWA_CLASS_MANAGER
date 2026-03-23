@@ -1,0 +1,179 @@
+{% extends 'notes_app/base.html' %}
+{% block title %}Reminders — IN16{% endblock %}
+{% block page_title %}My Reminders{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h4 class="fw-bold mb-1">
+    <i class="bi bi-alarm me-2"></i>Class Reminders
+  </h4>
+  <p class="mb-0 opacity-75 small">Set and manage your study reminders</p>
+</div>
+
+<div class="row g-4">
+
+  <!-- Form -->
+  <div class="col-12 col-md-5">
+    <div class="card">
+      <div class="card-header fw-600">
+        <i class="bi bi-plus-circle me-2" style="color:var(--in16-accent);"></i>
+        New Reminder
+      </div>
+
+      <div class="card-body">
+        <form method="post">
+          {% csrf_token %}
+
+          <div class="mb-3">
+            <label class="form-label small fw-500">Unit</label>
+            <select name="unit" class="form-select" required>
+              <option value="">— Select unit —</option>
+              {% for unit in form.unit.field.queryset %}
+              <option value="{{ unit.id }}">{{ unit.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label small fw-500">
+              Related Note <span class="text-muted">(optional)</span>
+            </label>
+            <select name="note" class="form-select">
+              <option value="">— None —</option>
+              {% for note in form.note.field.queryset %}
+              <option value="{{ note.id }}">{{ note.topic }} ({{ note.unit.name }})</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label small fw-500">Reminder Time</label>
+            <input type="datetime-local" name="reminder_time" class="form-control" required />
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label small fw-500">Message</label>
+            <textarea name="message" class="form-control" rows="3"
+                      placeholder="e.g. Revise Chapter 3 before tomorrow's CAT..." required></textarea>
+          </div>
+
+          <button type="submit"
+                  class="btn w-100"
+                  style="background:linear-gradient(135deg,var(--in16-accent),var(--in16-success));
+                         color:white;border:none;">
+            <i class="bi bi-alarm-fill me-2"></i>Set Reminder
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- List -->
+  <div class="col-12 col-md-7">
+
+    <!-- Upcoming -->
+    <div class="card mb-3">
+      <div class="card-header fw-600 d-flex align-items-center justify-content-between">
+        <span>
+          <i class="bi bi-clock-fill me-2" style="color:var(--in16-accent);"></i>
+          Upcoming ({{ upcoming.count }})
+        </span>
+      </div>
+
+      {% if upcoming %}
+      <div class="list-group list-group-flush">
+
+        {% for r in upcoming %}
+        <div class="list-group-item px-3 py-3">
+
+          <div class="d-flex align-items-start gap-3">
+
+            <!-- Icon -->
+            <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 text-white"
+                 style="width:38px;height:38px;
+                        background:linear-gradient(135deg,var(--in16-accent),var(--in16-success));
+                        font-size:.85rem;">
+              <i class="bi bi-alarm"></i>
+            </div>
+
+            <!-- Content -->
+            <div class="flex-grow-1">
+              <div class="fw-500 small">{{ r.message }}</div>
+
+              <div class="d-flex align-items-center gap-2 mt-1 flex-wrap">
+                <span class="unit-badge">{{ r.unit.name }}</span>
+
+                {% if r.note %}
+                <span class="badge border small"
+                      style="border-color:var(--in16-accent);color:var(--in16-accent);">
+                  {{ r.note.topic }}
+                </span>
+                {% endif %}
+
+                <span class="text-muted" style="font-size:.72rem;">
+                  <i class="bi bi-calendar me-1"></i>
+                  {{ r.reminder_time|date:"M d, Y H:i" }}
+                </span>
+              </div>
+            </div>
+
+            <!-- Action -->
+            <form method="post" action="{% url 'mark_reminder_done' r.id %}">
+              {% csrf_token %}
+              <button type="submit"
+                      class="btn btn-sm"
+                      style="border:1px solid var(--in16-success);color:var(--in16-success);"
+                      title="Mark done">
+                <i class="bi bi-check-lg"></i>
+              </button>
+            </form>
+
+          </div>
+
+        </div>
+        {% endfor %}
+
+      </div>
+      {% else %}
+      <div class="p-4 text-center text-muted small">
+        <i class="bi bi-alarm d-block fs-2 opacity-25 mb-2"></i>
+        No upcoming reminders.
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Past -->
+    {% if past %}
+    <div class="card">
+      <div class="card-header fw-600">
+        <i class="bi bi-check-circle me-2" style="color:var(--in16-success);"></i>
+        Past / Completed
+      </div>
+
+      <div class="list-group list-group-flush">
+        {% for r in past %}
+        <div class="list-group-item px-3 py-2 opacity-75">
+          <div class="d-flex align-items-center gap-3">
+
+            <i class="bi bi-check-circle-fill" style="color:var(--in16-success);"></i>
+
+            <div class="flex-grow-1">
+              <div class="small fw-500 text-decoration-line-through">
+                {{ r.message|truncatewords:10 }}
+              </div>
+
+              <div class="text-muted" style="font-size:.72rem;">
+                {{ r.unit.name }} · {{ r.reminder_time|date:"M d, Y H:i" }}
+              </div>
+            </div>
+
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+  </div>
+</div>
+{% endblock %}

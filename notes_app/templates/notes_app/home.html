@@ -1,0 +1,208 @@
+{% extends 'notes_app/base.html' %}
+{% block title %}Home — IN16{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+    <div>
+      <h4 class="mb-1 fw-bold">
+        <i class="bi bi-hand-wave me-2"></i>
+        Welcome, {{ user.first_name|default:user.username }}!
+      </h4>
+      <p class="mb-0 opacity-75 small">IN16 Study Manager — your centralized academic hub</p>
+    </div>
+    {% if user.student %}
+    <div class="badge bg-white text-dark fs-6 mono px-3 py-2">
+      {{ user.student.reg_number }}
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Stats Row -->
+<div class="row g-3 mb-4">
+  <div class="col-6 col-md-3">
+    <div class="card card-hover h-100">
+      <div class="card-body text-center py-3">
+        <div style="font-size:2rem;color:var(--in16-dark);">
+          <i class="bi bi-grid-3x3-gap-fill"></i>
+        </div>
+        <div class="fs-3 fw-bold">{{ units.count }}</div>
+        <div class="text-muted small">Units</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-6 col-md-3">
+    <div class="card card-hover h-100">
+      <div class="card-body text-center py-3">
+        <div style="font-size:2rem;color:var(--in16-accent);">
+          <i class="bi bi-journal-richtext"></i>
+        </div>
+        <div class="fs-3 fw-bold">{{ notes_count }}</div>
+        <div class="text-muted small">Notes</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-6 col-md-3">
+    <div class="card card-hover h-100">
+      <div class="card-body text-center py-3">
+        <div style="font-size:2rem;color:var(--in16-success);">
+          <i class="bi bi-people-fill"></i>
+        </div>
+        <div class="fs-3 fw-bold">{{ students_count }}</div>
+        <div class="text-muted small">Students</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-6 col-md-3">
+    <div class="card card-hover h-100">
+      <div class="card-body text-center py-3">
+        <div style="font-size:2rem;color:var(--in16-deep);">
+          <i class="bi bi-alarm-fill"></i>
+        </div>
+        <div class="fs-3 fw-bold">{{ upcoming_reminders.count }}</div>
+        <div class="text-muted small">Reminders</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4">
+  <!-- Announcements -->
+  <div class="col-12 col-md-7">
+    <div class="card h-100">
+      <div class="card-header d-flex align-items-center justify-content-between">
+        <span class="fw-600">
+          <i class="bi bi-megaphone me-2" style="color:var(--in16-accent);"></i>
+          Latest Announcements
+        </span>
+        <a href="{% url 'announcements' %}" 
+           class="btn btn-sm"
+           style="border:1px solid var(--in16-accent); color:var(--in16-accent);">
+          View All
+        </a>
+      </div>
+
+      <div class="card-body p-0">
+        {% if announcements %}
+          {% for ann in announcements %}
+          <div class="p-3 border-bottom announcement-card">
+            <div class="d-flex align-items-start gap-3">
+              <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+                   style="width:36px;height:36px;background:rgba(135,187,162,.2);">
+                <i class="bi bi-bell-fill" style="font-size:.8rem;color:var(--in16-dark);"></i>
+              </div>
+
+              <div class="flex-grow-1 min-width-0">
+                <div class="fw-600 small">{{ ann.title }}</div>
+                <div class="text-muted" style="font-size:.8rem;">
+                  {{ ann.content|truncatewords:20 }}
+                </div>
+                <div class="text-muted mt-1" style="font-size:.72rem;">
+                  <i class="bi bi-clock me-1"></i>
+                  {{ ann.created_at|date:"M d, Y" }}
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        {% else %}
+          <div class="p-4 text-center text-muted">
+            <i class="bi bi-megaphone fs-2 opacity-25 d-block mb-2"></i>
+            No announcements yet.
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Side -->
+  <div class="col-12 col-md-5">
+
+    <!-- Reminders -->
+    {% if upcoming_reminders %}
+    <div class="card mb-3">
+      <div class="card-header d-flex align-items-center justify-content-between">
+        <span class="fw-600">
+          <i class="bi bi-alarm me-2" style="color:var(--in16-deep);"></i>
+          Upcoming Reminders
+        </span>
+        <a href="{% url 'reminders' %}" 
+           class="btn btn-sm"
+           style="border:1px solid var(--in16-deep); color:var(--in16-deep);">
+          Manage
+        </a>
+      </div>
+
+      <div class="list-group list-group-flush">
+        {% for r in upcoming_reminders %}
+        <div class="list-group-item px-3 py-2">
+          <div class="small fw-500">{{ r.message|truncatewords:10 }}</div>
+          <div class="text-muted" style="font-size:.75rem;">
+            <i class="bi bi-calendar me-1"></i>
+            {{ r.reminder_time|date:"M d, Y H:i" }}
+            — <span class="unit-badge">{{ r.unit.name }}</span>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Quick Access -->
+    <div class="card">
+      <div class="card-header fw-600">
+        <i class="bi bi-lightning-fill me-2" style="color:var(--in16-accent);"></i>
+        Quick Access
+      </div>
+
+      <div class="card-body p-2">
+        <div class="row g-2">
+
+          <div class="col-6">
+            <a href="{% url 'units' %}" 
+               class="btn w-100 py-3 d-flex flex-column align-items-center gap-1"
+               style="border:1px solid var(--in16-dark); color:var(--in16-dark);">
+              <i class="bi bi-grid fs-4"></i>
+              <span class="small">Units</span>
+            </a>
+          </div>
+
+          <div class="col-6">
+            <a href="{% url 'notes' %}" 
+               class="btn w-100 py-3 d-flex flex-column align-items-center gap-1"
+               style="border:1px solid var(--in16-accent); color:var(--in16-accent);">
+              <i class="bi bi-journal-text fs-4"></i>
+              <span class="small">Notes</span>
+            </a>
+          </div>
+
+          <div class="col-6">
+            <a href="{% url 'groups' %}" 
+               class="btn w-100 py-3 d-flex flex-column align-items-center gap-1"
+               style="border:1px solid var(--in16-success); color:var(--in16-success);">
+              <i class="bi bi-people fs-4"></i>
+              <span class="small">Groups</span>
+            </a>
+          </div>
+
+          <div class="col-6">
+            <a href="{% url 'students' %}" 
+               class="btn w-100 py-3 d-flex flex-column align-items-center gap-1"
+               style="border:1px solid var(--in16-deep); color:var(--in16-deep);">
+              <i class="bi bi-person-lines-fill fs-4"></i>
+              <span class="small">Class List</span>
+            </a>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
