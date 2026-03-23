@@ -37,14 +37,6 @@ python manage.py makemigrations
 python manage.py migrate
 ````
 
-This creates:
-- 6 units
-- 8 sample students (password: `pass1234`)
-- 6 notes across units
-- 3 study groups
-- 3 announcements
-- Superuser: `admin` / `admin123`
-
 ### 5. Run the development server
 
 ```bash
